@@ -1,0 +1,47 @@
+*** write a query to print lowest and highest salary emp in each department.
+---with cte as(select max(salary) as max,min(salary) as min,dep_id
+   from employee
+   group by dep_id),
+   cte1 as( select c.dep_id,emp_name as max_salary_emp from employee e inner join cte c on 
+   e.dep_id=c.dep_id and e.salary=c.max),
+   cte2 as( select c.dep_id,emp_name as min_salary_emp from employee e inner join cte c on 
+   e.dep_id=c.dep_id and e.salary=c.min)
+
+   select c1.dep_id,c1.max_salary_emp,c2.min_salary_emp from cte1 c1 inner join cte2 c2 on c1.dep_id=c2.dep_id;
+
+*** How to find duplicates in given table(specific column).
+--- select column_name,count(1) from table_name group by column_name having count(1)>1;
+
+*** How to delete duplicates(emp_id column from emp table)
+--- with cte as (select *,row_number() over(partition by emp_id order by emp_id) as rn) from emp.
+    delete from cte where rn>1
+
+*** Find employees with salary more than their managers salary.
+--- select e1.*,e2.salary as manager_salary
+    from emp e1 inner join emp e2 
+    on e1.manager_id=e2.emp_id 
+    where e1.salary>e2.salary
+
+*** ICC given Team_1,Team_2,won convert Team,matches,no_of_won,no_of_loss
+---create table icc_world_cup
+(
+Team_1 Varchar(20),
+Team_2 Varchar(20),
+Winner Varchar(20)
+);
+INSERT INTO icc_world_cup values('India','SL','India');
+INSERT INTO icc_world_cup values('SL','Aus','Aus');
+INSERT INTO icc_world_cup values('SA','Eng','Eng');
+INSERT INTO icc_world_cup values('Eng','NZ','NZ');
+INSERT INTO icc_world_cup values('Aus','India','India');
+
+--select * from icc_world_cup;
+
+---select Team,count(*) as matches,sum(points) as no_of_won,count(*)-sum(points) as no_of_losses
+from(select Team_1 as Team,case when Team_1=winner then 1 else 0 end as points from icc_world_cup
+union ALL
+select Team_2 as Team,case when Team_2=winner then 1 else 0 end as points from icc_world_cup) as A 
+group by Team
+;
+
+    
